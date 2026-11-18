@@ -1,0 +1,50 @@
+# Runs the verification checks on every push and pull request, inside the
+# same image everyone uses in VS Code. New jobs (lint, formal, co-sim) get
+# added here as each step of the plan lands.
+
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull the verification image
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/semitov-verif-env:latest"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker pull "$IMAGE"
+
+      - name: Tool check
+        run: docker run --rm "$IMAGE" check-tools
+
+      - name: Hello-world simulation (Verilator, cocotb, pyuvm, cocotb-coverage)
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -e CCACHE_DIR=/tmp/ccache \
+            -v "$PWD":/work -w /work "$IMAGE" make -C tests/hello
+
+      - name: Hello-world formal (SymbiYosys, Boolector)
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp \
+            -v "$PWD":/work -w /work "$IMAGE" make -C tests/hello formal
+
+      - name: Keep test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hello-results
+          path: |
+            tests/hello/results.xml
+            tests/hello/coverage.xml
+          if-no-files-found: ignore

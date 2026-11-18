@@ -1,0 +1,7 @@
+sim_build/
+results.xml
+coverage.xml
+__pycache__/
+*.fst
+*.vcd
+counter/

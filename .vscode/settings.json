@@ -1,0 +1,6 @@
+{
+  // Intentionally empty for now.
+  // True "always open in container" comes from Project Manager after you
+  // Save Project once while already attached to the Dev Container
+  // (stores a vscode-remote://dev-container+… URI in projects.json).
+}

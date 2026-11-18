@@ -1,0 +1,28 @@
+# macOS / editors
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Simulation / formal outputs (also listed under tests/hello/)
+**/sim_build/
+**/results.xml
+**/coverage.xml
+**/*.fst
+**/*.vcd
+**/counter/
+
+# Local Docker / buildx leftovers
+*.tar
+*.tar.gz

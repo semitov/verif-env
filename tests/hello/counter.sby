@@ -1,0 +1,17 @@
+# Formal hello-world: bounded model check of the counter properties.
+# Run from this folder: `make formal` (or `sby -f counter.sby`)
+
+[options]
+mode bmc
+depth 20
+
+[engines]
+smtbmc boolector
+
+[script]
+read -formal counter.sv counter_props.sv
+prep -top counter_props
+
+[files]
+counter.sv
+counter_props.sv

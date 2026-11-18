@@ -1,0 +1,63 @@
+// Dev Containers configuration for the SemiTO-V verification environment.
+//
+// In VS Code: install the "Dev Containers" extension, open this repository,
+// then run "Dev Containers: Reopen in Container" from the command palette.
+// See docs/SETUP.md for the full first-day guide.
+{
+  "name": "SemiTO-V Verification",
+
+  // Prebuilt image on GHCR. To rebuild locally instead, replace "image" with:
+  // "build": { "dockerfile": "../docker/Dockerfile", "context": "../docker" },
+  "image": "ghcr.io/filippobrogi00/semitov-verif-env:latest",
+
+  // TAP networking (Step 6): lets `tap-up` create a virtual network interface.
+  "runArgs": ["--cap-add=NET_ADMIN", "--device=/dev/net/tun"],
+
+  // Work as the non-root user "dev". On Linux hosts its UID is changed to
+  // match yours, so files you create keep your ownership.
+  "remoteUser": "dev",
+  "updateRemoteUserUID": true,
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // Python
+        "ms-python.python",
+        "ms-python.debugpy",
+        "ms-python.vscode-python-envs",
+        "ms-python.pylint",
+        "ms-python.black-formatter",
+        // C/C++
+        "ms-vscode.cpptools",
+        // SystemVerilog / HDL
+        "mshr-h.veriloghdl",
+        "lramseyer.vaporview",
+        // Assembly
+        "squarewave.arm-asm-syntax",
+        // Config / data files (JSON is built-in)
+        "redhat.vscode-yaml",
+        "tamasfe.even-better-toml",
+        // Makefile
+        "ms-vscode.makefile-tools",
+        // License generation
+        "ultram4rine.vscode-choosealicense",
+        // GitHub
+        "GitHub.vscode-pull-request-github",
+        "GitHub.vscode-github-actions",
+        // QoL
+        "ionutvmi.path-autocomplete",
+        "mszkarlat.relative-path-finder",
+        "EditorConfig.EditorConfig",
+        "wayou.vscode-todo-highlight"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/opt/venv/bin/python",
+        "verilog.linting.linter": "verilator",
+        "files.eol": "\n"
+      }
+    }
+  },
+
+  // Print every tool version once the container is ready.
+  "postCreateCommand": "check-tools"
+}

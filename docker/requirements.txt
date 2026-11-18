@@ -1,0 +1,8 @@
+# Python packages for the SemiTO-V verification image.
+# Exact versions: everyone and CI get the same ones. Bump deliberately.
+
+cocotb==2.1.0           # Python testbenches on top of Verilator (needs Verilator >= 5.036)
+pyuvm==5.0.0            # UVM structure (agents, scoreboards) in Python
+cocotb-coverage==2.0    # functional coverage
+pytest==9.2.0           # test runner used by cocotb's Python runner
+scapy==2.8.0            # build, send and capture Ethernet frames over TAP (Step 6)

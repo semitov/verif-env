@@ -1,0 +1,11 @@
+# Keep Linux line endings everywhere. Scripts checked out with Windows (CRLF)
+# endings fail inside the container with errors like "bash\r: not found".
+* text=auto eol=lf
+
+# Binary files
+*.png  binary
+*.jpg  binary
+*.pdf  binary
+*.fst  binary
+*.elf  binary
+*.bin  binary
