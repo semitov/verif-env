@@ -1,5 +1,5 @@
 # Builds the verification image, tests it, and publishes it to the GitHub
-# Container Registry as ghcr.io/<owner>/semitov-verif-env.
+# Container Registry as ghcr.io/semitov/semitov-verif-env.
 #
 # Runs when anything in docker/ changes on main, or by hand from the Actions tab.
 # The first run takes about an hour: the arm64 half (for Apple Silicon Macs)

@@ -26,7 +26,7 @@ table in the README). After changing pins:
 docker build -t semitov-verif-env:local docker
 # or multi-arch publish (maintainers):
 # docker buildx build --platform linux/amd64,linux/arm64 \
-#   -t ghcr.io/<owner>/semitov-verif-env:latest --push docker
+#   -t ghcr.io/semitov/semitov-verif-env:latest --push docker
 ```
 
 ## Code style

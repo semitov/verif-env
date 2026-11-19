@@ -44,6 +44,9 @@
         // GitHub
         "GitHub.vscode-pull-request-github",
         "GitHub.vscode-github-actions",
+        // Copilot
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
         // QoL
         "ionutvmi.path-autocomplete",
         "mszkarlat.relative-path-finder",
