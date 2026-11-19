@@ -19,9 +19,15 @@ First-day guide: **[docs/SETUP.md](docs/SETUP.md)**.
 ## Quick start
 
 1. Install [Git](https://git-scm.com/), [Docker](https://docs.docker.com/get-docker/), and [VS Code](https://code.visualstudio.com/) or [Cursor](https://cursor.com/) with the **Dev Containers** extension.
-2. Clone this repository (on Windows: clone **inside WSL**, not on `C:\`).
-3. Open the folder → **Dev Containers: Reopen in Container**.
-4. Wait for the image pull (~1.3 GB download; keep ~15 GB free). Then:
+2. Clone this repository and open it in the container (on Windows: clone **inside WSL**, not on `C:\`):
+
+```bash
+git clone https://github.com/semitov/semitov-verif-env.git
+cd semitov-verif-env
+```
+
+Open the folder → **Dev Containers: Reopen in Container**.
+Wait for the image pull (~1.3 GB download; keep ~15 GB free). Then in the container terminal:
 
 ```bash
 check-tools
@@ -30,6 +36,8 @@ make -C tests/hello WAVES=1
 make -C tests/hello formal
 spike --isa=rv32i $RISCV_TESTS/isa/rv32ui-p-add && echo "Spike OK"
 ```
+
+3. You’re ready to work on the environment in the verification repos.
 
 No GHCR login is required while the package stays public.
 
