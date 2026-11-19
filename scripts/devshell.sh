@@ -10,7 +10,7 @@
 
 set -euo pipefail
 
-IMAGE=${SEMITO_IMAGE:-ghcr.io/filippobrogi00/semitov-verif-env:latest}
+IMAGE=${SEMITO_IMAGE:-ghcr.io/semitov/semitov-verif-env:latest}
 REPO=$(cd "$(dirname "$0")/.." && pwd)
 
 tty_flags=()

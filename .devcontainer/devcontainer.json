@@ -8,7 +8,7 @@
 
   // Prebuilt image on GHCR. To rebuild locally instead, replace "image" with:
   // "build": { "dockerfile": "../docker/Dockerfile", "context": "../docker" },
-  "image": "ghcr.io/filippobrogi00/semitov-verif-env:latest",
+  "image": "ghcr.io/semitov/semitov-verif-env:latest",
 
   // TAP networking (Step 6): lets `tap-up` create a virtual network interface.
   "runArgs": ["--cap-add=NET_ADMIN", "--device=/dev/net/tun"],

@@ -5,7 +5,7 @@
 Open-source Docker / Dev Container environment for the **SemiTO-V** student
 team: the same verification tools on every laptop and in CI.
 
-Image (public): [`ghcr.io/filippobrogi00/semitov-verif-env:latest`](https://ghcr.io/filippobrogi00/semitov-verif-env:latest)
+Image (public): [`ghcr.io/semitov/semitov-verif-env:latest`](https://ghcr.io/semitov/semitov-verif-env:latest)
 
 | Included | Role |
 | --- | --- |
@@ -62,8 +62,8 @@ Change pins on a branch, open a PR, merge when CI is green. The *Build verificat
 
 ## Publishing the image
 
-- **Already published** (manual buildx) as `ghcr.io/filippobrogi00/semitov-verif-env:latest` (amd64 + arm64).
-- After this repo is on GitHub, pushes that touch `docker/` (or a manual workflow run) rebuild via `.github/workflows/image.yml` and push to `ghcr.io/<owner>/semitov-verif-env`.
+- **Already published** (manual buildx) as `ghcr.io/semitov/semitov-verif-env:latest` (amd64 + arm64).
+- Pushes that touch `docker/` (or a manual workflow run) rebuild via `.github/workflows/image.yml` and push to `ghcr.io/semitov/semitov-verif-env`.
 
 Keep the GHCR package **Public** so the team can pull without tokens.
 

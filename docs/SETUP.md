@@ -31,7 +31,7 @@ Give Docker at least 4 CPUs and 8 GB of memory (Docker Desktop → Settings → 
 2. Open the folder in VS Code or Cursor. Windows: run `code .` or `cursor .` from the WSL terminal.
 3. Choose **Reopen in Container**, or open the command palette (Ctrl/Cmd+Shift+P) and run **Dev Containers: Reopen in Container**.
 4. The first time, Docker downloads the public image
-   `ghcr.io/filippobrogi00/semitov-verif-env:latest`. When it is done, the
+   `ghcr.io/semitov/semitov-verif-env:latest`. When it is done, the
    terminal prints the tool check (`check-tools`), ending with **All tools found.**
 
 From then on, every terminal in the IDE is a terminal inside the container.
