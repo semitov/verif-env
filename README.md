@@ -16,18 +16,31 @@ Image (public): [`ghcr.io/semitov/semitov-verif-env:latest`](https://ghcr.io/sem
 
 First-day guide: **[docs/SETUP.md](docs/SETUP.md)**.
 
-## Quick start
+## Quick start (normal workflow)
 
-1. Install [Git](https://git-scm.com/), [Docker](https://docs.docker.com/get-docker/), and [VS Code](https://code.visualstudio.com/) or [Cursor](https://cursor.com/) with the **Dev Containers** extension.
-2. Clone this repository and open it in the container (on Windows: clone **inside WSL**, not on `C:\`):
+You do **not** need to clone this repository to do verification work. Copy
+[`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json) into the
+project repo you are working on, then open that project in the container.
+
+1. Install [Git](https://git-scm.com/), [Docker](https://docs.docker.com/get-docker/), and [VS Code](https://code.visualstudio.com/) with the **Dev Containers** extension (`ms-vscode-remote.remote-containers`).
+2. **Windows:** use **WSL2** before anything else. Install WSL (`wsl --install` in an admin PowerShell, then reboot), install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/) with the WSL2 backend, enable your Ubuntu distro under Docker Desktop → Settings → Resources → WSL integration, and install the **WSL** extension in VS Code. Clone and open project repos **inside WSL** (for example `~/my-project`), not on `C:\`. From the WSL terminal run `code .`, then **Dev Containers: Reopen in Container**.
+3. **macOS / Linux:** install Docker (Docker Desktop on macOS; Docker Engine on Linux, then `sudo usermod -aG docker $USER` and log out/in). Open the project folder in VS Code → **Dev Containers: Reopen in Container**.
+4. First open pulls `ghcr.io/semitov/semitov-verif-env:latest` (~1.3 GB; keep ~15 GB free). No GHCR login is required while the package stays public.
+
+Give Docker at least 4 CPUs and 8 GB of memory (Docker Desktop → Settings → Resources).
+
+## Testing the tools (this repository)
+
+Clone and open **this** repository only when you are developing or smoke-testing
+the environment itself (not for day-to-day project work):
 
 ```bash
 git clone https://github.com/semitov/semitov-verif-env.git
 cd semitov-verif-env
 ```
 
-Open the folder → **Dev Containers: Reopen in Container**.
-Wait for the image pull (~1.3 GB download; keep ~15 GB free). Then in the container terminal:
+On Windows, clone **inside WSL**, then `code .` from that terminal.
+**Dev Containers: Reopen in Container**, wait for the image pull, then:
 
 ```bash
 check-tools
@@ -36,10 +49,6 @@ make -C tests/hello WAVES=1
 make -C tests/hello formal
 spike --isa=rv32i $RISCV_TESTS/isa/rv32ui-p-add && echo "Spike OK"
 ```
-
-3. You’re ready to work on the environment in the verification repos.
-
-No GHCR login is required while the package stays public.
 
 Without an IDE: `scripts/devshell.sh` or `scripts/devshell.sh make -C tests/hello`.
 
@@ -51,7 +60,7 @@ Without an IDE: `scripts/devshell.sh` or `scripts/devshell.sh make -C tests/hell
 | `.devcontainer/` | Dev Container config (pulls the GHCR image) |
 | `.github/workflows/` | Image publish + CI smoke tests |
 | `tests/hello/` | Hello-world sim, waves, and formal check |
-| `scripts/devshell.sh` | Container shell without VS Code / Cursor |
+| `scripts/devshell.sh` | Container shell without VS Code |
 | `docs/SETUP.md` | Full onboarding and troubleshooting |
 
 ## Updating tools

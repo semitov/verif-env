@@ -5,38 +5,56 @@ versions as CI. You install a few things on your laptop; everything else
 (Verilator, cocotb, pyuvm, SymbiYosys, riscv-formal, Spike, the RISC-V
 compiler) is already in the container.
 
-Goal: from a fresh laptop to a passing hello-world test in under an hour.
-Most of that time is the first download of the image: about 1.3 GB, which
-takes about 5 GB of disk once unpacked. Keep at least 15 GB free.
+You do **not** need to clone this repository for day-to-day verification work.
+Copy [`.devcontainer/devcontainer.json`](../.devcontainer/devcontainer.json)
+into the project repo you are working on, then reopen that project in the
+container. The first image download is about 1.3 GB (~5 GB unpacked); keep at
+least 15 GB free.
 
 ## 1. Install
 
 Everyone: [Git](https://git-scm.com/), [Docker](https://docs.docker.com/get-docker/),
-and either [VS Code](https://code.visualstudio.com/) or [Cursor](https://cursor.com/)
-with the **Dev Containers** extension (`ms-vscode-remote.remote-containers`).
+and [VS Code](https://code.visualstudio.com/) with the **Dev Containers** extension
+(`ms-vscode-remote.remote-containers`).
 
 Then, depending on your OS:
 
 | OS | Install | Watch out for |
 | --- | --- | --- |
 | Linux | [Docker Engine](https://docs.docker.com/engine/install/), then `sudo usermod -aG docker $USER` and log out and back in | Nothing special |
-| Windows 10/11 | WSL2 (`wsl --install` in an admin PowerShell, then reboot), then [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/) with the WSL2 backend; enable your Ubuntu distro under Docker Desktop → Settings → Resources → WSL integration. In VS Code / Cursor, also install the **WSL** extension | Clone the repository **inside WSL** (for example `~/semitov-verif-env`), not on `C:\`. Builds on `C:\` are several times slower |
+| Windows 10/11 | **WSL2 first** (`wsl --install` in an admin PowerShell, then reboot), then [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/) with the WSL2 backend; enable your Ubuntu distro under Docker Desktop → Settings → Resources → WSL integration. In VS Code, also install the **WSL** extension | Clone and open project repos **inside WSL** (for example `~/my-project`), not on `C:\`. Work on `C:\` is several times slower. Always start VS Code from the WSL terminal (`code .`) **before** **Reopen in Container** |
 | macOS | [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/) | Apple Silicon is fine: the image has a native arm64 version |
 
 Give Docker at least 4 CPUs and 8 GB of memory (Docker Desktop → Settings → Resources).
 
-## 2. Open the repository in the container
+## 2. Open your project in the container
 
-1. Clone this repository. Windows: run this in the Ubuntu (WSL) terminal.
-2. Open the folder in VS Code or Cursor. Windows: run `code .` or `cursor .` from the WSL terminal.
-3. Choose **Reopen in Container**, or open the command palette (Ctrl/Cmd+Shift+P) and run **Dev Containers: Reopen in Container**.
+1. Add `.devcontainer/devcontainer.json` from this repository to your project
+   (or confirm the project already has it).
+2. Open the project folder in VS Code.
+   - **Windows:** open it from the WSL terminal with `code .`.
+   - **macOS / Linux:** open the folder as usual.
+3. Command palette → **Dev Containers: Reopen in Container**.
 4. The first time, Docker downloads the public image
-   `ghcr.io/semitov/semitov-verif-env:latest`. When it is done, the
-   terminal prints the tool check (`check-tools`), ending with **All tools found.**
+   `ghcr.io/semitov/semitov-verif-env:latest`. No GHCR login is required while
+   the package stays public.
 
 From then on, every terminal in the IDE is a terminal inside the container.
+CI already validates the image when it is published, so you do not need to
+re-run the hello-world suite to start working.
 
-## 3. Check that everything works
+## 3. Testing the tools (optional)
+
+Clone **this** repository only when you are developing or smoke-testing the
+environment itself:
+
+```bash
+git clone https://github.com/semitov/semitov-verif-env.git
+cd semitov-verif-env
+```
+
+On Windows, clone **inside WSL**, then `code .` from that terminal.
+**Dev Containers: Reopen in Container**, then:
 
 ```bash
 check-tools                    # every tool and its version: ends with "All tools found."
@@ -49,10 +67,11 @@ spike --isa=rv32i $RISCV_TESTS/isa/rv32ui-p-add && echo "Spike OK"
 Open the waveform: in the Explorer, click `tests/hello/dump.fst`. It opens in
 VaporView, the waveform viewer installed in the container.
 
-If all of these pass, you are done. If anything fails, post the output of
-`check-tools` in the team channel.
+If anything fails, post the output of `check-tools` in the team channel.
 
-## Without VS Code / Cursor
+## Without VS Code
+
+From a clone of this repository:
 
 ```bash
 scripts/devshell.sh                         # interactive shell
@@ -67,7 +86,8 @@ ip addr show tap0
 ```
 
 On Windows and macOS, the TAP interface lives inside Docker's Linux virtual
-machine, so traffic scripts must also run inside the container.
+machine, so traffic scripts must also run inside the container. Your project's
+`devcontainer.json` needs the TAP `runArgs` from this repository's config.
 
 ## Updating
 
@@ -79,6 +99,7 @@ command palette → **Dev Containers: Rebuild Container**.
 | Problem | Fix |
 | --- | --- |
 | `denied` or `unauthorized` when pulling the image | The package should be **Public**. If it was made private, ask a maintainer to open it again, or `docker login ghcr.io` with a token that has `read:packages` |
+| `not found` when pulling the image | The image was not published yet, or the tag is wrong. Ask a maintainer to run **Build verification image** and confirm the package is public |
 | `/usr/bin/env: 'bash\r': No such file or directory` | The repository was checked out with Windows line endings. In WSL: `git config --global core.autocrlf false`, then clone again |
 | Everything is very slow on Windows | The repository is on `C:\`. Clone it inside WSL instead (see step 1) |
 | Very slow on a Mac with Apple Silicon | You are running the x86 image under emulation. In a container terminal, `uname -m` should print `aarch64` |
