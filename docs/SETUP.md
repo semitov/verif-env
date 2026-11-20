@@ -36,16 +36,49 @@ must be able to pull `ghcr.io/semitov/semitov-verif-env:latest`.
    **Personal access tokens** → **Tokens (classic)** →
    **Generate new token (classic)**.
 2. Name the token, set an expiry, enable **`read:packages`**, generate it, and
-   copy the value (shown only once).
-3. In a terminal (on Windows: inside WSL):
+   copy the value (shown only once). Do **not** commit it.
+3. Save the PAT somewhere durable — a password manager,
+   [GitHub CLI](https://cli.github.com/) (`gh auth login`), or a Git credential
+   helper:
 
 ```bash
-echo "<YOUR_PAT>" | docker login ghcr.io -u <YOUR_GITHUB_USERNAME> --password-stdin
+# macOS
+git config --global credential.helper osxkeychain
+
+# Windows (Git Credential Manager; run inside WSL if that is where you work)
+git config --global credential.helper manager
+
+# Linux (plaintext file in your home directory — prefer a password manager if you can)
+git config --global credential.helper store
+# Or short-lived cache only:
+# git config --global credential.helper 'cache --timeout=86400'
 ```
 
-You only need to do this once per machine (until the token expires or you
+```bash
+printf "protocol=https\nhost=ghcr.io\nusername=<YOUR_GITHUB_USERNAME>\npassword=<YOUR_PAT>\n\n" \
+  | git credential approve
+```
+
+Or with GitHub CLI instead of a classic PAT helper:
+
+```bash
+gh auth login
+# choose GitHub.com → HTTPS → authenticate (browser or token)
+```
+
+4. Log Docker into GHCR (on Windows: run this inside WSL):
+
+```bash
+# With the PAT (from your password manager / credential helper):
+echo "<YOUR_PAT>" | docker login ghcr.io -u <YOUR_GITHUB_USERNAME> --password-stdin
+
+# Or if you used gh auth login:
+echo "$(gh auth token)" | docker login ghcr.io -u "$(gh api user -q .login)" --password-stdin
+```
+
+You only need the Docker login once per machine (until the token expires or you
 `docker logout ghcr.io`). If the GHCR package is **Public**, anonymous pulls
-also work and you can skip this step.
+also work and you can skip this section.
 
 ## 3. Open your project in the container
 

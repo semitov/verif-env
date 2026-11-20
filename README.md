@@ -23,15 +23,46 @@ You do **not** need to clone this repository to do verification work. Copy
 project repo you are working on, then open that project in the container.
 
 1. Install [Git](https://git-scm.com/), [Docker](https://docs.docker.com/get-docker/), and [VS Code](https://code.visualstudio.com/) with the **Dev Containers** extension (`ms-vscode-remote.remote-containers`).
-2. **Windows:** use **WSL2** before anything else. Install WSL (`wsl --install` in an admin PowerShell, then reboot), install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/) with the WSL2 backend, enable your Ubuntu distro under Docker Desktop → Settings → Resources → WSL integration, and install the **WSL** extension in VS Code. Clone and open project repos **inside WSL** (for example `~/my-project`), not on `C:\`. From the WSL terminal run `code .`, then **Dev Containers: Reopen in Container**.
+2. **Windows:** use **WSL2** before anything else. Install WSL (`wsl --install` in an admin PowerShell, then reboot), install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/) with the WSL2 backend, enable your Ubuntu distro under Docker Desktop → Settings → Resources → WSL integration, and install the **WSL** extension in VS Code. Clone and open project repos **inside WSL** (for example `~/my-project`), not on `C:\`.
 3. **macOS / Linux:** install Docker (Docker Desktop on macOS; Docker Engine on Linux, then `sudo usermod -aG docker $USER` and log out/in).
 4. Log in to GHCR so Docker can pull the image (once per machine):
    1. On GitHub: profile picture → **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)** → **Generate new token (classic)**.
-   2. Give it a name, set an expiry, enable the **`read:packages`** scope, and generate the token. Copy it once.
-   3. In a terminal (on Windows: inside WSL), run:
+   2. Give it a name, set an expiry, enable the **`read:packages`** scope, and generate the token. Copy it once — do **not** commit it. Save it with a password manager, with [GitHub CLI](https://cli.github.com/) (`gh auth login`), or with a Git credential helper (below).
+   3. Configure a credential helper (pick your OS), then store the PAT:
 
    ```bash
+   # macOS
+   git config --global credential.helper osxkeychain
+
+   # Windows (Git Credential Manager; run inside WSL if that is where you work)
+   git config --global credential.helper manager
+
+   # Linux (plaintext file in your home directory — prefer a password manager if you can)
+   git config --global credential.helper store
+   # Or short-lived cache only:
+   # git config --global credential.helper 'cache --timeout=86400'
+   ```
+
+   ```bash
+   printf "protocol=https\nhost=ghcr.io\nusername=<YOUR_GITHUB_USERNAME>\npassword=<YOUR_PAT>\n\n" \
+     | git credential approve
+   ```
+
+   Or skip the helper and use GitHub CLI instead:
+
+   ```bash
+   gh auth login
+   # choose GitHub.com → HTTPS → authenticate (browser or token)
+   ```
+
+   4. In a terminal (on Windows: inside WSL), log Docker into GHCR:
+
+   ```bash
+   # With the PAT (from your password manager / credential helper):
    echo "<YOUR_PAT>" | docker login ghcr.io -u <YOUR_GITHUB_USERNAME> --password-stdin
+
+   # Or if you used gh auth login:
+   echo "$(gh auth token)" | docker login ghcr.io -u "$(gh api user -q .login)" --password-stdin
    ```
 
 5. Open the project folder in VS Code (`code .` from WSL on Windows) → **Dev Containers: Reopen in Container**. First open pulls `ghcr.io/semitov/semitov-verif-env:latest` (~1.3 GB; keep ~15 GB free).
