@@ -24,11 +24,19 @@ project repo you are working on, then open that project in the container.
 
 1. Install [Git](https://git-scm.com/), [Docker](https://docs.docker.com/get-docker/), and [VS Code](https://code.visualstudio.com/) with the **Dev Containers** extension (`ms-vscode-remote.remote-containers`).
 2. **Windows:** use **WSL2** before anything else. Install WSL (`wsl --install` in an admin PowerShell, then reboot), install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/) with the WSL2 backend, enable your Ubuntu distro under Docker Desktop → Settings → Resources → WSL integration, and install the **WSL** extension in VS Code. Clone and open project repos **inside WSL** (for example `~/my-project`), not on `C:\`. From the WSL terminal run `code .`, then **Dev Containers: Reopen in Container**.
-3. **macOS / Linux:** install Docker (Docker Desktop on macOS; Docker Engine on Linux, then `sudo usermod -aG docker $USER` and log out/in). Open the project folder in VS Code → **Dev Containers: Reopen in Container**.
-4. First open pulls `ghcr.io/semitov/semitov-verif-env:latest` (~1.3 GB; keep ~15 GB free). No GHCR login is required while the package stays public.
+3. **macOS / Linux:** install Docker (Docker Desktop on macOS; Docker Engine on Linux, then `sudo usermod -aG docker $USER` and log out/in).
+4. Log in to GHCR so Docker can pull the image (once per machine):
+   1. On GitHub: profile picture → **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)** → **Generate new token (classic)**.
+   2. Give it a name, set an expiry, enable the **`read:packages`** scope, and generate the token. Copy it once.
+   3. In a terminal (on Windows: inside WSL), run:
+
+   ```bash
+   echo "<YOUR_PAT>" | docker login ghcr.io -u <YOUR_GITHUB_USERNAME> --password-stdin
+   ```
+
+5. Open the project folder in VS Code (`code .` from WSL on Windows) → **Dev Containers: Reopen in Container**. First open pulls `ghcr.io/semitov/semitov-verif-env:latest` (~1.3 GB; keep ~15 GB free).
 
 Give Docker at least 4 CPUs and 8 GB of memory (Docker Desktop → Settings → Resources).
-
 ## Testing the tools (this repository)
 
 Clone and open **this** repository only when you are developing or smoke-testing
@@ -79,10 +87,28 @@ Change pins on a branch, open a PR, merge when CI is green. The *Build verificat
 
 ## Publishing the image
 
-- **Already published** (manual buildx) as `ghcr.io/semitov/semitov-verif-env:latest` (amd64 + arm64).
-- Pushes that touch `docker/` (or a manual workflow run) rebuild via `.github/workflows/image.yml` and push to `ghcr.io/semitov/semitov-verif-env`.
+```mermaid
+flowchart LR
+  subgraph ci["verif-env repo CI"]
+    direction LR
+    Dockerfile --> build_amd64["build amd64"]
+    build_amd64 --> test["test in container"]
+    test --> build_multi["build amd64+arm64"]
+    build_multi --> push["docker push"]
+  end
 
-Keep the GHCR package **Public** so the team can pull without tokens.
+  push --> ghcr[("GHCR package")]
+  ghcr --> local["Dev Container / local pull"]
+  ghcr --> other["other repo CI jobs<br/>container: image: …"]
+```
+
+Pushes that touch `docker/` (or a manual workflow run) rebuild via
+[`.github/workflows/image.yml`](.github/workflows/image.yml) and push
+`ghcr.io/semitov/semitov-verif-env:latest` (amd64 + arm64).
+
+If the package is **Public**, pulls work without a token. If it is private (or
+pulls return `denied` / `unauthorized`), use the classic PAT login steps in
+**Quick start** above.
 
 ## License
 

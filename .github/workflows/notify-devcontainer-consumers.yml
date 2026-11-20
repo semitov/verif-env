@@ -1,0 +1,28 @@
+# Tell consumer repos to refresh their copy of .devcontainer/devcontainer.json.
+#
+# Requires a fine-grained PAT (or classic PAT with repo scope) stored as the
+# repository secret REPO_DISPATCH_TOKEN, with access to each consumer repo
+# (contents: read, actions: write is enough for repository_dispatch).
+
+name: Notify Dev Container consumers
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        repository:
+          - semitov/RV32I-datapath-design
+    steps:
+      - name: repository_dispatch → sync-devcontainer
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.REPO_DISPATCH_TOKEN }}
+          repository: ${{ matrix.repository }}
+          event-type: sync-devcontainer

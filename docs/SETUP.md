@@ -27,7 +27,27 @@ Then, depending on your OS:
 
 Give Docker at least 4 CPUs and 8 GB of memory (Docker Desktop → Settings → Resources).
 
-## 2. Open your project in the container
+## 2. Log in to GHCR (consumer repos)
+
+From the project repo where you copied `.devcontainer/devcontainer.json`, Docker
+must be able to pull `ghcr.io/semitov/semitov-verif-env:latest`.
+
+1. On GitHub: profile picture → **Settings** → **Developer settings** →
+   **Personal access tokens** → **Tokens (classic)** →
+   **Generate new token (classic)**.
+2. Name the token, set an expiry, enable **`read:packages`**, generate it, and
+   copy the value (shown only once).
+3. In a terminal (on Windows: inside WSL):
+
+```bash
+echo "<YOUR_PAT>" | docker login ghcr.io -u <YOUR_GITHUB_USERNAME> --password-stdin
+```
+
+You only need to do this once per machine (until the token expires or you
+`docker logout ghcr.io`). If the GHCR package is **Public**, anonymous pulls
+also work and you can skip this step.
+
+## 3. Open your project in the container
 
 1. Add `.devcontainer/devcontainer.json` from this repository to your project
    (or confirm the project already has it).
@@ -35,15 +55,13 @@ Give Docker at least 4 CPUs and 8 GB of memory (Docker Desktop → Settings → 
    - **Windows:** open it from the WSL terminal with `code .`.
    - **macOS / Linux:** open the folder as usual.
 3. Command palette → **Dev Containers: Reopen in Container**.
-4. The first time, Docker downloads the public image
-   `ghcr.io/semitov/semitov-verif-env:latest`. No GHCR login is required while
-   the package stays public.
+4. The first time, Docker downloads
+   `ghcr.io/semitov/semitov-verif-env:latest` (~1.3 GB).
 
 From then on, every terminal in the IDE is a terminal inside the container.
 CI already validates the image when it is published, so you do not need to
 re-run the hello-world suite to start working.
-
-## 3. Testing the tools (optional)
+## 4. Testing the tools (optional)
 
 Clone **this** repository only when you are developing or smoke-testing the
 environment itself:
@@ -98,7 +116,7 @@ command palette → **Dev Containers: Rebuild Container**.
 
 | Problem | Fix |
 | --- | --- |
-| `denied` or `unauthorized` when pulling the image | The package should be **Public**. If it was made private, ask a maintainer to open it again, or `docker login ghcr.io` with a token that has `read:packages` |
+| `denied` or `unauthorized` when pulling the image | Create a classic PAT with `read:packages` and run `echo "<YOUR_PAT>" \| docker login ghcr.io -u <YOUR_GITHUB_USERNAME> --password-stdin` (see step 2), or ask a maintainer to make the package **Public** |
 | `not found` when pulling the image | The image was not published yet, or the tag is wrong. Ask a maintainer to run **Build verification image** and confirm the package is public |
 | `/usr/bin/env: 'bash\r': No such file or directory` | The repository was checked out with Windows line endings. In WSL: `git config --global core.autocrlf false`, then clone again |
 | Everything is very slow on Windows | The repository is on `C:\`. Clone it inside WSL instead (see step 1) |
